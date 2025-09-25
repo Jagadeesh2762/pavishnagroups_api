@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel, EmailStr
 from app.src.utils.email_utils import send_email
 
-email_router = APIRouter()
+email_router = APIRouter(prefix="/email", tags=["Email"] )
 
 class EmailRequest(BaseModel):
     to: EmailStr

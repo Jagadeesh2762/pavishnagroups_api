@@ -3,27 +3,55 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from app.src.routes.email_router import email_router
 
-email_app = FastAPI(title="Email Service API", description="API for sending emails via SMTP", version="1.0.0", docs_url=None, redoc_url="/redoc",  openapi_url="/email/openapi.json" )
+# ---------------------------
+# Email Service Sub-App
+# ---------------------------
+email_app = FastAPI(title="Pavishna Groups Email API", description="Handles email-related services", version="1.0.0", openapi_url="/openapi.json", docs_url=None, redoc_url=None, )
 
-email_app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "https://yourfrontend.com" ],  allow_credentials=True,  allow_methods=["*"],  allow_headers=["*"], )
+email_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "http://13.232.35.2", "https://yourfrontend.com" ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# Custom Swagger for email app
 @email_app.get("/docs", include_in_schema=False)
-async def custom_docs():
-    return get_swagger_ui_html( openapi_url="/service/email/openapi.json", title="Email Service API Docs", swagger_ui_parameters={"defaultModelsExpandDepth": -1} )
+async def email_docs():
+    return get_swagger_ui_html(openapi_url="/service/email/openapi.json", title="Email Service API Docs", swagger_ui_parameters={"defaultModelsExpandDepth": -1}, )
 
-api_router = APIRouter()
-api_router.include_router(email_router, prefix="/email")
+# Attach email router inside email_app
+email_router_api = APIRouter()
+email_router_api.include_router(email_router, prefix="/email")
+email_app.include_router(email_router_api)
 
-email_app.include_router(api_router)
 
+# ---------------------------
+# Main App (All Pavishna APIs)
+# ---------------------------
+main_app = FastAPI(title="Pavishna Groups Main API", description="Central API for all Pavishna Groups services", version="1.0.0", docs_url="/docs", redoc_url="/redoc", openapi_url="/openapi.json" )
 
-# Main entry app
-app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+# Global middleware for all services
+main_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "http://13.232.35.2", "https://yourfrontend.com" ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount the email service under /service/email
-app.mount("/service", email_app)
+main_app.mount("/service/email", email_app)
 
-# Health check
-@email_app.get("/health")
-async def health_check():
-    return {"status": "Success", "service": "Email API", "uptime": "running"}
+# ✅ If you also want email endpoints to show in main docs:
+main_app.include_router(email_router, prefix="/email", tags=["Email"])
+
+# Health check for Main API
+@main_app.get("/health", tags=["Health"])
+async def main_health_check():
+    return {"status": "Success", "service": "Main API", "uptime": "running"}
+
+
+# Entrypoint
+app = main_app

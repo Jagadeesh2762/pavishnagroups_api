@@ -6,7 +6,7 @@ from app.src.routes.email_router import email_router
 # ---------------------------
 # Email Service Sub-App
 # ---------------------------
-email_app = FastAPI(title="Pavishna Groups Email API", description="Handles email-related services", version="1.0.0", openapi_url="/openapi.json", docs_url=None, redoc_url=None, )
+email_app = FastAPI(title="Pavishna Groups Email API", description="Handles email-related services", version="1.0.0", openapi_url="/openapi.json", docs_url=None, redoc_url=None, root_path="/api/service/email" )
 
 email_app.add_middleware(
     CORSMiddleware,
@@ -30,7 +30,7 @@ email_app.include_router(email_router_api)
 # ---------------------------
 # Main App (All Pavishna APIs)
 # ---------------------------
-main_app = FastAPI(title="Pavishna Groups Main API", description="Central API for all Pavishna Groups services", version="1.0.0", docs_url="/docs", redoc_url="/redoc", openapi_url="/openapi.json" )
+main_app = FastAPI(title="Pavishna Groups Main API", description="Central API for all Pavishna Groups services", version="1.0.0", docs_url="/docs", redoc_url="/redoc", openapi_url="/openapi.json", root_path="/api" )
 
 # Global middleware for all services
 main_app.add_middleware(

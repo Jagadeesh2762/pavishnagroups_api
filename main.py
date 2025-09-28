@@ -7,7 +7,7 @@ app = FastAPI(title="Pavishna Groups API", description="Central API for all Pavi
 # Global CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[ "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "http://13.232.35.2", "https://yourfrontend.com" ],
+    allow_origins=[ "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "http://13.232.35.2", "https://pavishnagroups.com" ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
